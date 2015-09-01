@@ -3,7 +3,6 @@ class Api::V1::MastermindsController < ApplicationController
 
   def main
     request = params[:request] || params[:text]
-    require 'pry' ; binding.pry
     case request.strip.downcase
     when 'p', 'play' then play
     when 'q', 'quit' then quit
