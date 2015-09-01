@@ -17,7 +17,7 @@ class Game < ActiveRecord::Base
   alias_method :old_current!, :current!
 
   def current!
-    self.class.current.where.not(id: self.id).update_all(status: self.class.statuses[:started])
+    Game.current.where(player: self.player).where.not(id: self.id).update_all(status: Game.statuses[:started])
     old_current!
   end
 end
