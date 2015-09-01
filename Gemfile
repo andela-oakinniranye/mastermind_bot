@@ -8,13 +8,13 @@ gem 'master_mind', require: 'mastermind'
 gem 'unicorn'
 gem 'draper'
 gem 'active_model_serializers', '~> 0.8.0'
+gem 'pry-rails'
 
 
 group :development, :test do
   gem 'sqlite3'
   gem 'spring'
   gem 'rspec-rails'
-  gem 'pry-rails'
 end
 
 group :production do
