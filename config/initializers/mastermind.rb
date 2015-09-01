@@ -4,16 +4,6 @@ module Mastermind
   end
 
   Message.class_eval do
-    attr_reader :text
-    alias_method :old_set_attr, :set_attr
-    alias_method :old_to_json, :to_json
-
-    def set_attr(input)
-      old_set_attr(input)
-      @text = @message
-      self
-    end
-
     def multiple_games_record(games)
       number_of_games = games.length
       message = "You have #{number_of_games.humanize + ' game'.pluralize(number_of_games)} saved.\nSelect the one you want to play by posting ```select (id)``` with the #{'ids'.pluralize(number_of_games)} provided below:\n"

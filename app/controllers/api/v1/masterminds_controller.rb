@@ -31,7 +31,8 @@ class Api::V1::MastermindsController < ApplicationController
       send ```background``` to view the background of Mastermind
     EOS
     game.response.unsupported_game_action(message: message, status: :unknown)
-    render json: game.response
+    # render json: game.response
+    render text: game.response.message
   end
 
   def play(new_game=nil)
@@ -43,11 +44,13 @@ class Api::V1::MastermindsController < ApplicationController
       game.generate_colors
       game_record = current_player.games.create(colors: game.colors.join)
       game_record.current!
-      render json: game.instructions
+      # render json: game.instructions
+      render text: game.instructions.message
   end
 
   def let_me_select_the_game_i_want_to_play(games)
-    render json: mastermind_game.response.multiple_games_record(games)
+    # render json: mastermind_game.response.multiple_games_record(games)
+    render text: mastermind_game.response.multiple_games_record(games).message
   end
 
   def select_game_to_play(saved_game_or_new)
@@ -59,7 +62,8 @@ class Api::V1::MastermindsController < ApplicationController
     game.load_game(game_record)
 
     game_record.current!
-    render json: game.instructions
+    # render json: game.instructions
+    render text: game.instructions.message
   end
 
   def guess(guessed_color)
@@ -76,11 +80,8 @@ class Api::V1::MastermindsController < ApplicationController
     set_game_as_won(game_record, save_record) if response.status == :won
     response.append_message(response2) unless response.status == :won
     set_game_as_lost(game_record) if response.status == :lost
-    render json: response
-  end
-
-  def set_game_attr
-
+    # render json: response
+    render text: response.message
   end
 
   def set_game_as_won(game_record, save_record)
@@ -96,14 +97,17 @@ class Api::V1::MastermindsController < ApplicationController
   def quit
     game_record = current_player.games.current
     game_record.first.quitted! unless game_record.empty?
-    render json: mastermind_game.response.exit_game
+    # render json: mastermind_game.response.exit_game
+    render text: mastermind_game.response.exit_game.message
   end
 
   def instructions
-    render json: mastermind_main.response.gameplay_instructions
+    # render json: mastermind_main.response.gameplay_instructions
+    render text: mastermind_main.response.gameplay_instructions.message
   end
 
   def background
-    render json: mastermind_main.response.main_message
+    # render json: mastermind_main.response.main_message
+    render text: mastermind_main.response.main_message.message
   end
 end
