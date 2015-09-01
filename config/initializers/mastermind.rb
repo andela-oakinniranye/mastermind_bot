@@ -24,6 +24,12 @@ module Mastermind
 
   Game.class_eval do
     attr_reader :color_values_from_all_colors_array
+    alias_method :old_generate_colors, :generate_colors
+
+    def generate_colors
+      convert_level
+      old_generate_colors
+    end
 
     def get_player(player)
       @player = Player.new
