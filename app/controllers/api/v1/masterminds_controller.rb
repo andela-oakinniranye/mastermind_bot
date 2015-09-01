@@ -1,4 +1,4 @@
-class Api::V1::MastermindController < ApplicationController
+class Api::V1::MastermindsController < ApplicationController
   before_action :mastermind_main, :current_player
 
   def main
@@ -11,12 +11,27 @@ class Api::V1::MastermindController < ApplicationController
     when 'y', 'yes' then redirect_to :saved_games_api_v1_mastermind
     when /^select:(\w+)$/, /^select (\w+)$/ then select_game_to_play($1)
     when /^guess|g[:| ](\w+)$/ then guess($1)
-    # else raise NoRouteMatchError
+    else invalid_command
     end
   end
 
   def index
     render json: mastermind_main.response
+  end
+
+  def invalid_command
+    game = mastermind_game
+    message = "You entered an unsupported game action/command.\nSupported actions include: [ (p)lay | (g)uess| select | (q)uit | (b)ackground | (i)nstructions ]\n"
+    message += <<-EOS
+      send ```play``` to start the game
+      send ```guess (guess) e.g. 'guess RGBY' to guess (r)ed, (g)reen, (b)lue, (y)ellow```
+      send ```select (game_id) e.g. 'select u989hnjh989ihiu9u909'
+      send ```quit``` to quit the game
+      send ```instructions``` to view the game-play instructions
+      send ```background``` to view the background of Mastermind
+    EOS
+    game.response.unsupported_game_action(message: message, status: :unknown)
+    render json: game.response
   end
 
   def play(new_game=nil)
@@ -51,7 +66,6 @@ class Api::V1::MastermindController < ApplicationController
     game_record = current_player.games.current
     return play if game_record.empty?
     game_record = game_record.first.decorate
-    return play if game_record.trial_count > ::Mastermind::Game::ALLOWED_TRIALS
     game = mastermind_game
     game.load_game(game_record)
 
@@ -61,8 +75,12 @@ class Api::V1::MastermindController < ApplicationController
     response2 = mastermind_game.response.trial_count(game.trial_count, game.colors.join, game.color_values_from_all_colors_array)
     set_game_as_won(game_record, save_record) if response.status == :won
     response.append_message(response2) unless response.status == :won
-    set_game_as_lost(game, game_record) if response.status == :lost
+    set_game_as_lost(game_record) if response.status == :lost
     render json: response
+  end
+
+  def set_game_attr
+
   end
 
   def set_game_as_won(game_record, save_record)
@@ -71,9 +89,7 @@ class Api::V1::MastermindController < ApplicationController
     game_record.won!
   end
 
-  def set_game_as_lost(game, game_record)
-    require 'pry' ; binding.pry
-    # game.response.append_message("\nYou tried, but lost.\nThe colors generated were #{game.colors.join}.\nWant to try again? (p)lay to start again or (q)uit to exit or (t)op_players to view the top ten players. ")
+  def set_game_as_lost(game_record)
     game_record.ended!
   end
 

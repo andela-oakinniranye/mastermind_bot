@@ -1,0 +1,8 @@
+deployment:
+  develop:
+    branch: master
+    heroku:
+      appname: mastermindbot
+machine:
+  ruby:
+    version: 2.2.2

@@ -4,6 +4,16 @@ module Mastermind
   end
 
   Message.class_eval do
+    attr_reader :text
+    alias_method :old_set_attr, :set_attr
+    alias_method :old_to_json, :to_json
+
+    def set_attr(input)
+      old_set_attr(input)
+      @text = @message
+      self
+    end
+
     def multiple_games_record(games)
       number_of_games = games.length
       message = "You have #{number_of_games.humanize + ' game'.pluralize(number_of_games)} saved.\nSelect the one you want to play by posting ```select (id)``` with the #{'ids'.pluralize(number_of_games)} provided below:\n"
@@ -30,14 +40,6 @@ module Mastermind
       @player.set_attr(name: player.name)
     end
 
-    def load_current_game(colors, guess, trial_count, time_started)
-      @colors = colors
-      @trial_count = trial_count
-      @time_started = time_started
-      @character_count = @colors.length
-      @guess = guess
-    end
-
     def load_game(game)
       @colors = game.colors
       @trial_count = game.trial_count
@@ -53,10 +55,6 @@ module Mastermind
       return won(@time_started) if check_correct?(analyzed)
       @response.analyzed_guess(analyzed[:match_position], analyzed[:almost_match])
     end
-
-    # def update_game_record
-    #
-    # end
 
     def won(start_time)
       @time_taken = Time.now.to_i - start_time

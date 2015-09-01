@@ -11,19 +11,13 @@ class Game < ActiveRecord::Base
   end
 
   def self.saved_games
-    uncompleted = []
-    uncompleted += started unless started.empty?
-    uncompleted += current unless current.empty?
-    uncompleted
-    # uncompleted += wrong_guess unless wrong_guess.empty?
+    where("status = ? OR status = ? AND trial_count <= ?", statuses[:started], statuses[:current], Mastermind::Game::ALLOWED_TRIALS)
   end
 
   alias_method :old_current!, :current!
 
   def current!
-    self.class.where.not("id = ? OR status = ? OR status = ?", self.id, self.class.statuses[:won], self.class.statuses[:cheated]).update_all(status: self.class.statuses[:started])
+    self.class.current.where.not(id: self.id).update_all(status: self.class.statuses[:started])
     old_current!
-    # self.class.where.not(id: self.id, status: self.class.statuses[:won], ).update_all(status: self.class.statuses[:started])
-    # self.class.where.not(self).update_all(status: self.class.statuses[:started])
   end
 end
