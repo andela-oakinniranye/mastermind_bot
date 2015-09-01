@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resource :mastermind do
-        match 'main' => 'masterminds#main', via: [:get, :post]
+        post 'main' => 'masterminds#main'#, via: [:get, :post]
       end
     end
   end
