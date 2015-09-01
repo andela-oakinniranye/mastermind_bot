@@ -2,7 +2,8 @@ class Api::V1::MastermindsController < ApplicationController
   before_action :mastermind_main, :current_player
 
   def main
-    request = params[:request]
+    request = params[:request] || params[:text]
+    require 'pry' ; binding.pry
     case request.strip.downcase
     when 'p', 'play' then play
     when 'q', 'quit' then quit
